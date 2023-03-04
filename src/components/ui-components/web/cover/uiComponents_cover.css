@@ -1,0 +1,63 @@
+.uicover_background {
+  padding: 0 10% 0 10%;
+  z-index: -1;
+  left: 0;
+  width: 100%;
+  min-height: 10px;
+  background-color: #d5e2ead7;
+}
+
+.uicover_error {
+  background-color: #c93a1d99 !important;
+}
+
+.uicover_die {
+  background-color: #00000099 !important;
+  color: white !important;
+}
+
+.uicover_animation {
+  padding: 0% 10% 0% 10%;
+  z-index: -1;
+  left: 0;
+  width: 100%;
+  background: linear-gradient(90deg, #1f3d4e, #d5e2ea9f, #1f3d4e);
+  background-size: 200% 200%;
+  animation: gradient 5s ease infinite;
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+
+.uiMenssage{
+  width: 100%;
+  padding: 0 7% 0 10%;
+  margin-top: 10px;
+  font-size: medium;
+}
+
+
+.uiMenssage_loading{
+  background-color: #cc9900;
+  color: white;
+}
+
+.uiMenssage_error{
+  background-color: #c93a1d;
+  color: white;
+}
+
+.uiMenssage_die{
+  background-color: #585858;
+  color: white;
+}

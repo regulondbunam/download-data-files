@@ -1,0 +1,11 @@
+.tabHeader {
+  width: 100%;
+  padding-left: 10%;
+  display: flow-root;
+}
+
+.tabContent {
+  float: left;
+  padding-right: 1%;
+  font-size: 12px;
+}

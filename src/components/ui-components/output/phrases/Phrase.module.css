@@ -1,0 +1,28 @@
+.phraseHeader{
+    display: flex;
+    align-items: center;
+}
+
+.phraseIconButton{
+    float: left;
+    width: 25px;
+    height: 25px;
+}
+
+.phraseIcon{
+    font-size: 18px;
+}
+
+.phraseTip{
+    min-width: 300px;
+    max-width: 400px;
+    position: absolute;
+    box-shadow: rgba(0, 0, 0, 0.5) 5px 5px 5px 0px;
+    background-color: rgb(244, 245, 245);
+}
+
+.phraseTipControl{
+    display: flex;
+    justify-content: right;
+    align-items: right;
+}
