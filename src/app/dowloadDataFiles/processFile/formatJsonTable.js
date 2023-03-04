@@ -35,8 +35,8 @@ export function formatJsonTable(text="") {
                     captureMetadataFlag = undefined
                 }else{
                     metadata[captureMetadataFlag] += line+"\n"
+                    return 0
                 }
-                return 0
             }
             if (line.match("##rif-version")) {
                 metadata.version = line.split(" ")[1]
