@@ -1,5 +1,5 @@
-import {tsvParse} from "d3"
-export function formatJsonTable(text="") {
+import { tsvParse } from "d3"
+export function formatJsonTable(text = "") {
     let metadata = {
         version: "",
         license: "",
@@ -14,14 +14,14 @@ export function formatJsonTable(text="") {
     let textLines = text.split("\n")
     let captureMetadataFlag = undefined
     let captureColumns = false
-    textLines.forEach((line)=>{
+    textLines.forEach((line) => {
         if (!line.match(/^#/)) {
-            tsvData += line+"\n"
-        }else{
+            tsvData += line + "\n"
+        } else {
             if (captureColumns) {
                 if (!line.match(/^#\s\(([0-9]*)\)/)) {
                     captureColumns = false
-                }else{
+                } else {
                     let columnName = line.match(/\(([0-9]*)\)\s([a-zA-Z])*/gm)
                     metadata.columns.push({
                         name: columnName[0],
@@ -33,8 +33,9 @@ export function formatJsonTable(text="") {
             if (captureMetadataFlag) {
                 if (line.match(/^#\s([A-Z][a-z]*)/)) {
                     captureMetadataFlag = undefined
-                }else{
-                    metadata[captureMetadataFlag] += line+"\n"
+                } else {
+                    let content = line.split(/^#\s*/)[1]
+                    metadata[captureMetadataFlag] += content + "\n"
                     return 0
                 }
             }
@@ -76,6 +77,13 @@ export function formatJsonTable(text="") {
     //let dataTest ="Hola\tcomo\testas\t\n10\t20\t30\n10\t20\t30"
     //console.log(tsvData);
     tsvData = tsvParse(tsvData)
-    console.log(metadata);
-    return {metadata, tsvData}
+    let columns = []
+    tsvData.columns.forEach((column) => {
+        columns.push({
+            Header: column,
+            accessor: column,
+        })
+    })
+    //console.log(metadata);
+    return { metadata, tsvData, columns }
 }
