@@ -65,7 +65,10 @@ export function ColumnSelector({
                             </Box>
                             <br />
                             <div  >
-                                <button>View Table</button>
+                                <button onClick={() => {
+                                    const element = document.getElementById("riTable");
+                                    element.scrollIntoView();
+                                }} >View Table</button>
                             </div>
                         </div>
                     )}
@@ -102,32 +105,3 @@ const IndeterminateCheckbox = React.forwardRef(
     }
 )
 
-/**
- * return (
-
-        <div style={{ display: "grid", height: "30px", gridTemplateColumns: "auto 150px 100px", gridColumnGap: "10px" }}  >
-            <h4 style={{ margin: "0", paddingLeft: "10px" }} >author's table</h4>
-            <div className="dropdown">
-                <button style={{ padding: "4px", width:"150px" }} >Display columns</button>
-                <div className="dropdown-content">
-                    <div>
-                        <div>
-                            <IndeterminateCheckbox {...getToggleHideAllColumnsProps()} /> Toggle
-                            All
-                        </div>
-                        {allColumns.map(column => (
-                            <div key={column.id}>
-                                <label>
-                                    <input type="checkbox" {...column.getToggleHiddenProps()} />{' '}
-                                    {column.id}
-                                </label>
-                            </div>
-                        ))}
-                        <br />
-                    </div>
-                </div>
-            </div>
-            <a style={{textAlign: "center",fontSize: "14px"}} href={`${process.env.REACT_APP_PROSSES_SERVICE}/${id_dataset}/authorData/cvs`}>Download File</a>
-        </div>
-    )
- */

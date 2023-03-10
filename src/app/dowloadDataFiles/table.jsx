@@ -1,14 +1,20 @@
 import React from 'react';
 import GlobalFilter from './tableComponents/GlobalFilter'
 import { useTable, useBlockLayout, useGlobalFilter, useResizeColumns, useSortBy } from 'react-table'
+import Box from '@mui/material/Box';
+import Paper from '@mui/material/Paper';
+import Stack from '@mui/material/Stack';
+import IconButton from '@mui/material/IconButton';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { FixedSizeList } from 'react-window'
 import scrollbarWidth from './scrollbarWidth'
 import { TableStyles } from "./styledComponents"
 import Style from './table.module.css'
 import { ColumnSelector } from './tableComponents/ColumnSelector'
 
-export default function Table({columns, data}) {
-    
+export default function Table({ columns, data }) {
+
     const _nRows = 20
     const defaultColumn = React.useMemo(
         () => ({
@@ -80,19 +86,29 @@ export default function Table({columns, data}) {
     return (
         <div>
             <div className={Style.author_row}  >
-            <ColumnSelector getToggleHideAllColumnsProps={getToggleHideAllColumnsProps} allColumns={allColumns} />
+                <ColumnSelector getToggleHideAllColumnsProps={getToggleHideAllColumnsProps} allColumns={allColumns} />
             </div>
-            <div className={Style.author_row}  >
-                <GlobalFilter
-                    preGlobalFilteredRows={preGlobalFilteredRows}
-                    globalFilter={state.globalFilter}
-                    setGlobalFilter={setGlobalFilter}
-                />
+            <div id='riTable' >
+                <Box>
+                    <Paper elevation={3} sx={{ width: '100%' }} >
+                        <Stack direction="row" alignItems="left" spacing={1}>
+                            <div style={{ marginLeft: "50px" }} >
+                                <h2>RI Table</h2>
+                            </div>
+                        </Stack>
+                        <GlobalFilter
+                            preGlobalFilteredRows={preGlobalFilteredRows}
+                            globalFilter={state.globalFilter}
+                            setGlobalFilter={setGlobalFilter}
+                        />
+                    </Paper>
+                </Box>
+
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "auto 10px" }} >
                 <TableStyles className={Style.window_table}>
                     <div {...getTableProps()} className="table">
-                        <div>
+                        <div >
                             {headerGroups.map(headerGroup => (
                                 <div {...headerGroup.getHeaderGroupProps()} className="tr">
                                     {headerGroup.headers.map(column => (
@@ -117,7 +133,7 @@ export default function Table({columns, data}) {
                             ))}
                         </div>
 
-                        <div {...getTableBodyProps()} >
+                        <div  {...getTableBodyProps()} >
                             <FixedSizeList
                                 height={heightTable}
                                 itemCount={rows.length}
