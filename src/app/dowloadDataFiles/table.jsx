@@ -1,17 +1,37 @@
 import React from 'react';
 import GlobalFilter from './tableComponents/GlobalFilter'
-import { useTable, useBlockLayout, useGlobalFilter, useResizeColumns, useSortBy } from 'react-table'
+import { useTable, useBlockLayout, useGlobalFilter, useResizeColumns, useSortBy, useFilters } from 'react-table'
+import { matchSorter } from 'match-sorter'
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
-import IconButton from '@mui/material/IconButton';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { FixedSizeList } from 'react-window'
 import scrollbarWidth from './scrollbarWidth'
 import { TableStyles } from "./styledComponents"
 import Style from './table.module.css'
 import { ColumnSelector } from './tableComponents/ColumnSelector'
+import SortByAlphaIcon from '@mui/icons-material/SortByAlpha';
+import SortIcon from '@mui/icons-material/Sort';
+
+function DefaultColumnFilter({
+    column: { filterValue, preFilteredRows, setFilter },
+}) {
+    const count = preFilteredRows.length
+
+    return (
+        <input
+            value={filterValue || ''}
+            onChange={e => {
+                setFilter(e.target.value || undefined) // Set undefined to remove the filter entirely
+            }}
+            placeholder={`Search ${count} records...`}
+        />
+    )
+}
+
+function fuzzyTextFilterFn(rows, id, filterValue) {
+    return matchSorter(rows, filterValue, { keys: [row => row.values[id]] })
+}
 
 export default function Table({ columns, data }) {
 
@@ -19,9 +39,30 @@ export default function Table({ columns, data }) {
     const defaultColumn = React.useMemo(
         () => ({
             width: 150,
+            Filter: DefaultColumnFilter,
         }),
         []
     )
+    const filterTypes = React.useMemo(
+        () => ({
+            // Add a new fuzzyTextFilterFn filter type.
+            fuzzyText: fuzzyTextFilterFn,
+            // Or, override the default text filter to use
+            // "startWith"
+            text: (rows, id, filterValue) => {
+                return rows.filter(row => {
+                    const rowValue = row.values[id]
+                    return rowValue !== undefined
+                        ? String(rowValue)
+                            .toLowerCase()
+                            .startsWith(String(filterValue).toLowerCase())
+                        : true
+                })
+            },
+        }),
+        []
+    )
+
     const scrollBarSize = React.useMemo(() => scrollbarWidth(), [])
     const {
         getTableProps,
@@ -41,7 +82,8 @@ export default function Table({ columns, data }) {
             data,
             defaultColumn,
         },
-
+        useFilters, // useFilters!
+        useGlobalFilter, // useGlobalFilter!
         useBlockLayout,
         useGlobalFilter,
         useSortBy,
@@ -112,7 +154,8 @@ export default function Table({ columns, data }) {
                             {headerGroups.map(headerGroup => (
                                 <div {...headerGroup.getHeaderGroupProps()} className="tr">
                                     {headerGroup.headers.map(column => (
-                                        <div {...column.getHeaderProps(column.getSortByToggleProps())} className="th" >
+                                        <div>
+                                            <div {...column.getHeaderProps(column.getSortByToggleProps())} className="th" >
                                             {column.render('Header')}
                                             <div
                                                 {...column.getResizerProps()}
@@ -121,13 +164,13 @@ export default function Table({ columns, data }) {
                                             />
                                             <div>
                                                 {column.isSorted
-                                                    ? column.isSortedDesc
-                                                        ? <i className='bx bx-sort-a-z' />
-                                                        : <i className='bx bx-sort-z-a' />
-                                                    : <i className='bx bx-sort-alt-2' />}
+                                                    ? <SortByAlphaIcon fontSize="small" />
+                                                    : <SortIcon fontSize="small" />}
                                             </div>
                                         </div>
-
+                                        <div>{column.canFilter ? column.render('Filter') : null}</div>
+                                        </div>
+                                        
                                     ))}
                                 </div>
                             ))}
