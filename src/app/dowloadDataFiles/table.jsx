@@ -1,7 +1,7 @@
 import React from 'react';
 import GlobalFilter from './tableComponents/GlobalFilter'
 import { useTable, useBlockLayout, useGlobalFilter, useResizeColumns, useSortBy, useFilters } from 'react-table'
-import { matchSorter } from 'match-sorter'
+//import { matchSorter } from 'match-sorter'
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
@@ -12,26 +12,32 @@ import Style from './table.module.css'
 import { ColumnSelector } from './tableComponents/ColumnSelector'
 import SortByAlphaIcon from '@mui/icons-material/SortByAlpha';
 import SortIcon from '@mui/icons-material/Sort';
-
+import filterRows from './processFile/filterRows';
+import { OptionFilter } from './processFile/filters';
+/*
 function DefaultColumnFilter({
     column: { filterValue, preFilteredRows, setFilter },
 }) {
     const count = preFilteredRows.length
 
     return (
-        <input
+        <div>
+            <input
             value={filterValue || ''}
             onChange={e => {
                 setFilter(e.target.value || undefined) // Set undefined to remove the filter entirely
             }}
             placeholder={`Search ${count} records...`}
         />
+        </div>
     )
 }
-
+*/
+/*
 function fuzzyTextFilterFn(rows, id, filterValue) {
+    console.log(rows)
     return matchSorter(rows, filterValue, { keys: [row => row.values[id]] })
-}
+}*/
 
 export default function Table({ columns, data }) {
 
@@ -39,26 +45,13 @@ export default function Table({ columns, data }) {
     const defaultColumn = React.useMemo(
         () => ({
             width: 150,
-            Filter: DefaultColumnFilter,
+            Filter: OptionFilter,
         }),
         []
     )
     const filterTypes = React.useMemo(
         () => ({
-            // Add a new fuzzyTextFilterFn filter type.
-            fuzzyText: fuzzyTextFilterFn,
-            // Or, override the default text filter to use
-            // "startWith"
-            text: (rows, id, filterValue) => {
-                return rows.filter(row => {
-                    const rowValue = row.values[id]
-                    return rowValue !== undefined
-                        ? String(rowValue)
-                            .toLowerCase()
-                            .startsWith(String(filterValue).toLowerCase())
-                        : true
-                })
-            },
+            fuzzyText: filterRows,
         }),
         []
     )
@@ -81,6 +74,7 @@ export default function Table({ columns, data }) {
             columns,
             data,
             defaultColumn,
+            filterTypes,
         },
         useFilters, // useFilters!
         useGlobalFilter, // useGlobalFilter!
@@ -91,7 +85,7 @@ export default function Table({ columns, data }) {
     )
 
     // use row to download filtered data 
-    console.log(rows)
+    //console.log(rows)
 
     const itemSize = 30
     const heightTable = _nRows * itemSize
@@ -156,21 +150,21 @@ export default function Table({ columns, data }) {
                                     {headerGroup.headers.map(column => (
                                         <div>
                                             <div {...column.getHeaderProps(column.getSortByToggleProps())} className="th" >
-                                            {column.render('Header')}
-                                            <div
-                                                {...column.getResizerProps()}
-                                                className={`resizer ${column.isResizing ? 'isResizing' : ''
-                                                    }`}
-                                            />
-                                            <div>
-                                                {column.isSorted
-                                                    ? <SortByAlphaIcon fontSize="small" />
-                                                    : <SortIcon fontSize="small" />}
+                                                {column.render('Header')}
+                                                <div
+                                                    {...column.getResizerProps()}
+                                                    className={`resizer ${column.isResizing ? 'isResizing' : ''
+                                                        }`}
+                                                />
+                                                <div>
+                                                    {column.isSorted
+                                                        ? <SortByAlphaIcon fontSize="small" />
+                                                        : <SortIcon fontSize="small" />}
+                                                </div>
                                             </div>
+                                            <div>{column.canFilter ? column.render('Filter') : null}</div>
                                         </div>
-                                        <div>{column.canFilter ? column.render('Filter') : null}</div>
-                                        </div>
-                                        
+
                                     ))}
                                 </div>
                             ))}
