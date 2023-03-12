@@ -1,6 +1,7 @@
 import React from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import InputLabel from '@mui/material/InputLabel';
@@ -13,6 +14,17 @@ import Stack from '@mui/material/Stack';
 import Divider from '@mui/material/Divider';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Tooltip from '@mui/material/Tooltip';
+import Paper from '@mui/material/Paper';
+import { styled } from '@mui/material/styles';
+
+const Item = styled(Paper)(({ theme }) => ({
+    backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
+    ...theme.typography.body2,
+    padding: theme.spacing(1),
+    width: '120px',
+    textAlign: 'center',
+    color: theme.palette.text.secondary,
+}));
 
 const style = {
     position: 'absolute',
@@ -30,14 +42,14 @@ export function OptionFilter({
     column: { filterValue, preFilteredRows, setFilter = [], id },
 }) {
     const [open, setOpen] = React.useState(false);
-    const [FilterState, setFilterState] = React.useState();
+    const [FilterState, setFilterState] = React.useState([{ logic: "^^", equal: "??", value: "" }]);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
-
+    console.log(FilterState)
     return (
         <div>
             <Button variant="contained" sx={{ width: "100%" }} onClick={handleOpen}>
-                {!FilterState
+                {FilterState[0].value === ""
                     ? "Set Filter"
                     : "Edit Filter"
                 }
@@ -52,7 +64,9 @@ export function OptionFilter({
                         {`${id} filter builder values`}
                     </Typography>
                     <div>
-                        <FilterParameter />
+                        {FilterState.map((filter, index) => {
+                            return <FilterParameter filter={filter} filterIndex={index} filterState={FilterState} setFilterState={setFilterState} key={`filter_${index}_${id}`} />
+                        })}
                     </div>
                     <br />
                     <Stack
@@ -60,39 +74,54 @@ export function OptionFilter({
                         justifyContent={"space-between"}
                         spacing={2}
                     >
-                        <Tooltip title="Clean Filter">
-                            <Button>
+                        <Tooltip title="Reset Filter">
+                            <Button onClick={() => {
+                                setFilter(undefined)
+                                setFilterState([{ logic: "^^", equal: "??", value: "" }])
+                                handleClose()
+                            }} >
                                 <DeleteIcon sx={{ fontSize: "20px" }} />
                             </Button>
                         </Tooltip>
-                        <Button onClick={()=>{
-                            setFilter([
-                                {logic: "^^", equal:"??", value:"promoter"},
-                                {logic: "&&", equal:"??", value: "tu"}
-                            ])
+                        <Button onClick={() => {
+                            setFilter(FilterState)
                             handleClose()
                         }} variant="contained" color='secondary' >set filter</Button>
-                        <Button  onClick={handleClose} color='secondary' >cancel</Button>
-
+                        <Button onClick={handleClose} color='secondary' >cancel</Button>
                     </Stack>
-
                 </Box>
-
             </Modal>
         </div>
     )
 }
 
-function FilterParameter({ setFilter, addFilter }) {
-    const [equalExpression, setEqualExpression] = React.useState('like');
-    const [logicExpression, setLogicExpression] = React.useState('add');
-    const handleChange = (event) => {
-        setEqualExpression(event.target.value);
-    };
-    const handleChangeLogic = (event) => {
-        const value = event.target.value
-        setLogicExpression(value);
-    };
+function FilterParameter({ filter, setFilterState, filterState, filterIndex }) {
+    const { equal, logic, value } = filter
+    const updateFilterState = (equal, logic, value) => {
+        let filters = filterState.map((filterS, index) => {
+            if (index === filterIndex) {
+                return { equal, logic, value }
+            }
+            return filterS
+        })
+        setFilterState(filters)
+    }
+    const newFilterState = () => {
+        if (filterState.length <= 7) {
+            setFilterState([...filterState, { logic: "&&", equal: "??", value: "" }])
+        }else{
+            alert("limit of filters reached")
+        }
+    }
+    const deleteFilterState = () => {
+        let filters = []
+        filterState.forEach((filterS, index) => {
+            if (index !== filterIndex) {
+                filters.push(filterS)
+            }
+        })
+        setFilterState(filters)
+    }
 
     return (
         <Stack
@@ -100,22 +129,41 @@ function FilterParameter({ setFilter, addFilter }) {
             divider={<Divider orientation="vertical" flexItem />}
             spacing={2}
         >
+            {logic === "^^"
+                ? <Item></Item>
+                : <FormControl variant="standard" sx={{ m: 1, width: 110 }}>
+                    <InputLabel id="demo-simple-select-standard-label">Logic add</InputLabel>
+                    <Select
+                        labelId="demo-simple-select-standard-label"
+                        id="demo-simple-select-standard"
+                        value={logic}
+                        onChange={(event) => {
+                            let logicValue = event.target.value
+                            updateFilterState(equal, logicValue, value)
+                        }}
+                        label="Logic add"
+                    >
+                        <MenuItem value={'&&'}>And</MenuItem>
+                        <MenuItem value={'||'}>Or</MenuItem>
+                    </Select>
+                </FormControl>
+            }
             <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
                 <InputLabel id="demo-simple-select-standard-label">Equal Expression</InputLabel>
                 <Select
                     labelId="demo-simple-select-standard-label"
                     id="demo-simple-select-standard"
-                    value={equalExpression}
-                    onChange={handleChange}
+                    value={equal}
+                    onChange={(event) => { updateFilterState(event.target.value, logic, value) }}
                     label="Equal Expression"
                 >
-                    <MenuItem value={'like'}>Like</MenuItem>
-                    <MenuItem value={'not like'}>Not Like</MenuItem>
-                    <MenuItem value={'equal'}>Equal</MenuItem>
-                    <MenuItem value={'not equal'}>Not Equal</MenuItem>
+                    <MenuItem value={'??'}>Like</MenuItem>
+                    <MenuItem value={'!??'}>Not Like</MenuItem>
+                    <MenuItem value={'=='}>Equal</MenuItem>
+                    <MenuItem value={'!=='}>Not Equal</MenuItem>
                 </Select>
             </FormControl>
-            {equalExpression.match('like')
+            {equal.match(/\?\?/)
                 ? <TextField label="word" sx={{ width: 200 }} variant="standard" />
                 : <Autocomplete
                     disablePortal
@@ -125,20 +173,31 @@ function FilterParameter({ setFilter, addFilter }) {
                     renderInput={(params) => <TextField {...params} variant="standard" label="term" />}
                 />
             }
-            <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
-                <InputLabel id="demo-simple-select-standard-label">Add filter value</InputLabel>
-                <Select
-                    labelId="demo-simple-select-standard-label"
-                    id="demo-simple-select-standard"
-                    value={logicExpression}
-                    onChange={handleChangeLogic}
-                    label="Add filter value"
-                >
-                    <MenuItem value={'add'}>---</MenuItem>
-                    <MenuItem value={'and'}>And</MenuItem>
-                    <MenuItem value={'or'}>Or</MenuItem>
-                </Select>
-            </FormControl>
+            <Stack
+                direction="row"
+                spacing={1}
+            >
+
+                {logic !== "^^"
+                    ? (
+                        <Tooltip title="Clean Filter">
+                            <IconButton
+                                onClick={deleteFilterState}
+                                color="primary" aria-label="upload picture" component="label">
+                                <DeleteIcon sx={{ fontSize: "20px" }} />
+                            </IconButton>
+                        </Tooltip>
+                    )
+                    : (
+                        <Tooltip title="Add filter">
+                            <IconButton
+                                onClick={newFilterState}
+                                color="primary" aria-label="upload picture" component="label">
+                                +
+                            </IconButton>
+                        </Tooltip>
+                    )}
+            </Stack>
         </Stack>
     )
 }
