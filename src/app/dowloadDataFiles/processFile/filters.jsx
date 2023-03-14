@@ -9,7 +9,7 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import TextField from '@mui/material/TextField';
 import Select from '@mui/material/Select';
-import Autocomplete from '@mui/material/Autocomplete';
+//import Autocomplete from '@mui/material/Autocomplete';
 import Stack from '@mui/material/Stack';
 import Divider from '@mui/material/Divider';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -45,10 +45,13 @@ export function OptionFilter({
     const [FilterState, setFilterState] = React.useState([{ logic: "^^", equal: "??", value: "" }]);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
-    console.log(FilterState)
+    const wordsList = React.useMemo(() => {
+        return wordsListProcess(preFilteredRows, id)
+    }, [preFilteredRows, id])
+    //console.log(FilterState)
     return (
         <div>
-            <Button variant="contained" sx={{ width: "100%" }} onClick={handleOpen}>
+            <Button size="small" variant="contained" sx={{ width: "100%" }} color={FilterState[0].value === "" ? "primary" : "secondary"} onClick={handleOpen}>
                 {FilterState[0].value === ""
                     ? "Set Filter"
                     : "Edit Filter"
@@ -65,7 +68,7 @@ export function OptionFilter({
                     </Typography>
                     <div>
                         {FilterState.map((filter, index) => {
-                            return <FilterParameter filter={filter} filterIndex={index} filterState={FilterState} setFilterState={setFilterState} key={`filter_${index}_${id}`} />
+                            return <FilterParameter wordsList={wordsList} filter={filter} filterIndex={index} filterState={FilterState} setFilterState={setFilterState} key={`filter_${index}_${id}`} />
                         })}
                     </div>
                     <br />
@@ -109,7 +112,7 @@ function FilterParameter({ filter, setFilterState, filterState, filterIndex }) {
     const newFilterState = () => {
         if (filterState.length <= 7) {
             setFilterState([...filterState, { logic: "&&", equal: "??", value: "" }])
-        }else{
+        } else {
             alert("limit of filters reached")
         }
     }
@@ -163,16 +166,11 @@ function FilterParameter({ filter, setFilterState, filterState, filterIndex }) {
                     <MenuItem value={'!=='}>Not Equal</MenuItem>
                 </Select>
             </FormControl>
-            {equal.match(/\?\?/)
-                ? <TextField label="word" sx={{ width: 200 }} variant="standard" />
-                : <Autocomplete
-                    disablePortal
-                    id="combo-box-demo"
-                    options={[]}
-                    sx={{ width: 200 }}
-                    renderInput={(params) => <TextField {...params} variant="standard" label="term" />}
-                />
-            }
+            <TextField label="word" sx={{ width: 200 }}
+                    value={value}
+                    onChange={(event) => { updateFilterState(equal, logic, event.target.value) }}
+                    variant="standard" />
+            
             <Stack
                 direction="row"
                 spacing={1}
@@ -201,3 +199,24 @@ function FilterParameter({ filter, setFilterState, filterState, filterIndex }) {
         </Stack>
     )
 }
+
+function wordsListProcess(preFilteredRows, id) {
+    console.log(preFilteredRows);
+    return []
+}
+
+/**
+ * {equal.match(/\?\?/)
+                ? <TextField label="word" sx={{ width: 200 }}
+                    value={value}
+                    onChange={(event) => { updateFilterState(equal, logic, event.target.value) }}
+                    variant="standard" />
+                : <Autocomplete
+                    disablePortal
+                    id="combo-box-demo"
+                    options={[]}
+                    sx={{ width: 200 }}
+                    renderInput={(params) => <TextField {...params} variant="standard" label="term" />}
+                />
+            }
+ */

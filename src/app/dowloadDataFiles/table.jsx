@@ -14,30 +14,6 @@ import SortByAlphaIcon from '@mui/icons-material/SortByAlpha';
 import SortIcon from '@mui/icons-material/Sort';
 import filterRows from './processFile/filterRows';
 import { OptionFilter } from './processFile/filters';
-/*
-function DefaultColumnFilter({
-    column: { filterValue, preFilteredRows, setFilter },
-}) {
-    const count = preFilteredRows.length
-
-    return (
-        <div>
-            <input
-            value={filterValue || ''}
-            onChange={e => {
-                setFilter(e.target.value || undefined) // Set undefined to remove the filter entirely
-            }}
-            placeholder={`Search ${count} records...`}
-        />
-        </div>
-    )
-}
-*/
-/*
-function fuzzyTextFilterFn(rows, id, filterValue) {
-    console.log(rows)
-    return matchSorter(rows, filterValue, { keys: [row => row.values[id]] })
-}*/
 
 export default function Table({ columns, data }) {
 
@@ -149,20 +125,25 @@ export default function Table({ columns, data }) {
                                 <div {...headerGroup.getHeaderGroupProps()} className="tr">
                                     {headerGroup.headers.map(column => (
                                         <div>
-                                            <div {...column.getHeaderProps(column.getSortByToggleProps())} className="th" >
+                                            <div {...column.getHeaderProps()} className="th" >
                                                 {column.render('Header')}
                                                 <div
                                                     {...column.getResizerProps()}
                                                     className={`resizer ${column.isResizing ? 'isResizing' : ''
                                                         }`}
                                                 />
-                                                <div>
-                                                    {column.isSorted
-                                                        ? <SortByAlphaIcon fontSize="small" />
-                                                        : <SortIcon fontSize="small" />}
-                                                </div>
                                             </div>
-                                            <div>{column.canFilter ? column.render('Filter') : null}</div>
+                                            <div style={{ display: "flex" }} >
+                                                <div style={{ width: "50px" }} className="th"  >
+                                                    <div{...column.getSortByToggleProps()} >
+                                                        {column.isSorted
+                                                            ? <SortByAlphaIcon fontSize="small" />
+                                                            : <SortIcon fontSize="small" />}
+                                                    </div>
+                                                </div>
+                                                <div>{column.canFilter ? column.render('Filter') : null}</div>
+                                            </div>
+
                                         </div>
 
                                     ))}
