@@ -201,7 +201,7 @@ function FilterParameter({ filter, setFilterState, filterState, filterIndex }) {
 }
 
 function wordsListProcess(preFilteredRows, id) {
-    console.log(preFilteredRows);
+    //console.log(preFilteredRows);
     return []
 }
 

@@ -15,7 +15,7 @@ import SortIcon from '@mui/icons-material/Sort';
 import filterRows from './processFile/filterRows';
 import { OptionFilter } from './processFile/filters';
 
-export default function Table({ columns, data }) {
+export default function Table({ columns, data, riData }) {
 
     const _nRows = 20
     const defaultColumn = React.useMemo(
@@ -98,7 +98,7 @@ export default function Table({ columns, data }) {
     return (
         <div>
             <div className={Style.author_row}  >
-                <ColumnSelector getToggleHideAllColumnsProps={getToggleHideAllColumnsProps} allColumns={allColumns} />
+                <ColumnSelector columnsInfo={riData.metadata.columns} getToggleHideAllColumnsProps={getToggleHideAllColumnsProps} allColumns={allColumns} />
             </div>
             <div id='riTable' >
                 <Box>

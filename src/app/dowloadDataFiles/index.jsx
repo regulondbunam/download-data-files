@@ -27,7 +27,7 @@ export default function DownloadDataFile() {
             <article>
                 <p dangerouslySetInnerHTML={{ __html: DESCRIPTION }} />
                 {riData && (
-                    <Table columns={riData.columns} data={riData.tsvData} />
+                    <Table columns={riData.columns} data={riData.tsvData} riData={riData} />
                 )}
                 <Box >
                     <Paper elevation={3} sx={{ width: '100%', padding: "0 3% 2% 5%" }} >

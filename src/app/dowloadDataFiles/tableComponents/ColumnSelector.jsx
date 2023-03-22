@@ -1,8 +1,6 @@
 import React, { useState } from "react"
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
-import Grid from '@mui/material/Unstable_Grid2';
-import { styled } from '@mui/material/styles';
 import Stack from '@mui/material/Stack';
 import IconButton from '@mui/material/IconButton';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -11,6 +9,7 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 export function ColumnSelector({
     getToggleHideAllColumnsProps,
     allColumns,
+    columnsInfo
 }) {
 
     const [Show, setShow] = useState(true);
@@ -18,6 +17,8 @@ export function ColumnSelector({
     const handleShow = () => {
         setShow(!Show)
     }
+
+    console.log(columnsInfo);
 
     return (
         <Box
@@ -48,20 +49,32 @@ export function ColumnSelector({
                                 Show All
                             </div>
                             <Box>
-                                <Grid container spacing={1}>
-                                    {allColumns.map(column => (
-                                        <Grid xs="auto" key={column.id}>
-                                            <Item>
-                                                <label>
-                                                    <input type="checkbox" {...column.getToggleHiddenProps()} />{' '}
-                                                    {column.id}
-                                                </label>
-                                            </Item>
-                                        </Grid>
-                                    ))}
+                                <div>
+                                    {allColumns.map(column => {
+                                        let columnInfo = {}
+                                        try {
+                                            let colNum = column.id.split(")")
+                                            columnInfo = columnsInfo.find(col => col.name.toLowerCase().match(colNum[1].toLowerCase()))
+                                        } catch (error) {
+                                            console.log(columnsInfo);
+                                            console.error("get column description", error);
+                                        }
+
+                                        return (
+                                            <div key={column.id}>
+                                                    <label>
+                                                        <input type="checkbox" {...column.getToggleHiddenProps()} />{' '}
+                                                        {columnInfo?.description
+                                                            ? columnInfo.description
+                                                            : column.id
+                                                        }
+                                                    </label>
+                                            </div>
+                                        )
+                                    })}
 
 
-                                </Grid>
+                                </div>
                             </Box>
                             <br />
                             <div  >
@@ -84,13 +97,6 @@ export function ColumnSelector({
  * 
  */
 
-const Item = styled(Paper)(({ theme }) => ({
-    backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
-    ...theme.typography.body2,
-    padding: theme.spacing(1),
-    textAlign: 'center',
-    color: theme.palette.text.secondary,
-}));
 
 const IndeterminateCheckbox = React.forwardRef(
     ({ indeterminate, ...rest }, ref) => {
