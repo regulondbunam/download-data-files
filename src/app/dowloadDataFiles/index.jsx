@@ -21,31 +21,37 @@ export default function DownloadDataFile() {
 
     return (
         <div>
-            <Cover>
+            <Cover state={!riData ? "loading" : "done"} >
                 <h1>Regulatory Interactions</h1>
             </Cover>
             <article>
-                <p dangerouslySetInnerHTML={{ __html: DESCRIPTION }} />
-                {riData && (
-                    <Table columns={riData.columns} data={riData.tsvData} riData={riData} />
-                )}
-                <Box >
-                    <Paper elevation={3} sx={{ width: '100%', padding: "0 3% 2% 5%" }} >
-                        {riData && (
-                            Object.keys(riData.metadata).map(key => {
-                                if (key === "columns") {
-                                    return null
+                {riData ? (
+                    <div>
+                        <p dangerouslySetInnerHTML={{ __html: DESCRIPTION }} />
+                        <Table columns={riData.columns} data={riData.tsvData} riData={riData} />
+                        <Box >
+                            <Paper elevation={3} sx={{ width: '100%', padding: "0 3% 2% 5%" }} >
+                                {
+                                    Object.keys(riData.metadata).map(key => {
+                                        if (key === "columns") {
+                                            return null
+                                        }
+                                        return (
+                                            <div>
+                                                <h4>{key}</h4>
+                                                <p dangerouslySetInnerHTML={{ __html: riData.metadata[key] }} />
+                                            </div>
+                                        )
+                                    })
                                 }
-                                return (
-                                    <div>
-                                        <h4>{key}</h4>
-                                        <p dangerouslySetInnerHTML={{ __html: riData.metadata[key] }} />
-                                    </div>
-                                )
-                            })
-                        )}
-                    </Paper>
-                </Box>
+                            </Paper>
+                        </Box>
+                    </div>
+
+                )
+            : "loading"
+            }
+
             </article>
         </div>
 
