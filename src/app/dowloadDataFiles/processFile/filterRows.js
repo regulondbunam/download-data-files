@@ -9,7 +9,11 @@ export default function filterRows(rows, id, filterValue) {
         let arrayCondition = []
         filterValue.forEach((filter) => {
             let filterFlag = false
-            const { logic, equal, value = "" } = filter
+            const { logic, equal, regex } = filter
+            let value = filter.value
+            if (!regex && value) {
+                value = filter.value.replace(/([.?*+^$[\]\\(){}|-])/g, "\\$1")
+            }
             switch (equal) {
                 case "==":
                     filterFlag = rowValue.search(value) >= 0

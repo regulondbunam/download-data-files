@@ -42,7 +42,7 @@ export function OptionFilter({
     column: { filterValue, preFilteredRows, setFilter = [], id },
 }) {
     const [open, setOpen] = React.useState(false);
-    const [FilterState, setFilterState] = React.useState([{ logic: "^^", equal: "??", value: "" }]);
+    const [FilterState, setFilterState] = React.useState([{ logic: "^^", equal: "??", value: "", regex: false }]);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
     const wordsList = React.useMemo(() => {
@@ -99,11 +99,14 @@ export function OptionFilter({
 }
 
 function FilterParameter({ filter, setFilterState, filterState, filterIndex }) {
-    const { equal, logic, value } = filter
-    const updateFilterState = (equal, logic, value) => {
+    const [inputError, setInputError] = React.useState(false);
+    const { equal, logic, value, regex } = filter
+    const regexBackground = regex ? "#C98528" : "#666666"
+    const regexTooltip = regex ? "Deactivate Regex" : "Activate Regex"
+    const updateFilterState = (equal, logic, value, regex) => {
         let filters = filterState.map((filterS, index) => {
             if (index === filterIndex) {
-                return { equal, logic, value }
+                return { equal, logic, value, regex }
             }
             return filterS
         })
@@ -111,7 +114,7 @@ function FilterParameter({ filter, setFilterState, filterState, filterIndex }) {
     }
     const newFilterState = () => {
         if (filterState.length <= 7) {
-            setFilterState([...filterState, { logic: "&&", equal: "??", value: "" }])
+            setFilterState([...filterState, { logic: "&&", equal: "??", value: "", regex: false }])
         } else {
             alert("limit of filters reached")
         }
@@ -157,7 +160,7 @@ function FilterParameter({ filter, setFilterState, filterState, filterIndex }) {
                     labelId="demo-simple-select-standard-label"
                     id="demo-simple-select-standard"
                     value={equal}
-                    onChange={(event) => { updateFilterState(event.target.value, logic, value) }}
+                    onChange={(event) => { updateFilterState(event.target.value, logic, value, regex) }}
                     label="Equal Expression"
                 >
                     <MenuItem value={'??'}>Like</MenuItem>
@@ -166,11 +169,36 @@ function FilterParameter({ filter, setFilterState, filterState, filterIndex }) {
                     <MenuItem value={'!=='}>Not Equal</MenuItem>
                 </Select>
             </FormControl>
-            <TextField label="word" sx={{ width: 200 }}
+            <div style={{ display: "flex" }} >
+                <TextField label="word" sx={{ width: 200 }}
+                    error={inputError}
+                    helperText={inputError ? "Incorrect entry." : ""}
                     value={value}
-                    onChange={(event) => { updateFilterState(equal, logic, event.target.value) }}
+                    onChange={(event) => {
+                        if (regex) {
+                            try {
+                                new RegExp(event.target.value);
+                                updateFilterState(equal, logic, event.target.value, regex)
+                                setInputError(false)
+                            } catch (error) {
+                                setInputError(true)
+                                console.log(error);
+                            }
+                        } else {
+                            updateFilterState(equal, logic, event.target.value, regex)
+                        }
+                    }}
                     variant="standard" />
-            
+                <Tooltip title={regexTooltip} >
+                    <button
+                        onClick={() => { updateFilterState(equal, logic, value, !regex) }}
+                        style={{ backgroundColor: regexBackground, height: "30px", padding: "0", alignItems: "center" }} >
+                        .*
+                    </button>
+                </Tooltip>
+
+            </div>
+
             <Stack
                 direction="row"
                 spacing={1}
