@@ -18,7 +18,7 @@ export function ColumnSelector({
         setShow(!Show)
     }
 
-    console.log(columnsInfo);
+    //console.log(columnsInfo);
 
     return (
         <Box

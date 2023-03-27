@@ -9,7 +9,7 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import TextField from '@mui/material/TextField';
 import Select from '@mui/material/Select';
-//import Autocomplete from '@mui/material/Autocomplete';
+import Autocomplete from '@mui/material/Autocomplete';
 import Stack from '@mui/material/Stack';
 import Divider from '@mui/material/Divider';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -98,7 +98,7 @@ export function OptionFilter({
     )
 }
 
-function FilterParameter({ filter, setFilterState, filterState, filterIndex }) {
+function FilterParameter({ filter, setFilterState, filterState, filterIndex, wordsList }) {
     const [inputError, setInputError] = React.useState(false);
     const { equal, logic, value, regex } = filter
     const regexBackground = regex ? "#C98528" : "#666666"
@@ -170,32 +170,48 @@ function FilterParameter({ filter, setFilterState, filterState, filterIndex }) {
                 </Select>
             </FormControl>
             <div style={{ display: "flex" }} >
-                <TextField label="word" sx={{ width: 200 }}
-                    error={inputError}
-                    helperText={inputError ? "Incorrect entry." : ""}
-                    value={value}
-                    onChange={(event) => {
-                        if (regex) {
-                            try {
-                                new RegExp(event.target.value);
+                {equal.match(/\?\?/)
+                    ? <TextField label="word" sx={{ width: 200 }}
+                        error={inputError}
+                        helperText={inputError ? "Incorrect entry." : ""}
+                        value={value}
+                        onChange={(event) => {
+                            if (regex) {
+                                try {
+                                    new RegExp(event.target.value);
+                                    updateFilterState(equal, logic, event.target.value, regex)
+                                    setInputError(false)
+                                } catch (error) {
+                                    setInputError(true)
+                                    console.log(error);
+                                }
+                            } else {
                                 updateFilterState(equal, logic, event.target.value, regex)
-                                setInputError(false)
-                            } catch (error) {
-                                setInputError(true)
-                                console.log(error);
                             }
-                        } else {
-                            updateFilterState(equal, logic, event.target.value, regex)
-                        }
-                    }}
-                    variant="standard" />
-                <Tooltip title={regexTooltip} >
-                    <button
-                        onClick={() => { updateFilterState(equal, logic, value, !regex) }}
-                        style={{ backgroundColor: regexBackground, height: "30px", padding: "0", alignItems: "center" }} >
-                        .*
-                    </button>
-                </Tooltip>
+                        }}
+                        variant="standard" />
+                    : <Autocomplete
+                        disablePortal
+                        id="combo-box-demo"
+                        value={value}
+                        options={wordsList}
+                        sx={{ width: 200 }}
+                        onInputChange={(event, newInputValue) => {
+                            updateFilterState(equal, logic, newInputValue, regex)
+                          }}
+                        renderInput={(params) => <TextField {...params} variant="standard" label="term" />}
+                    />
+                }
+                {equal.match(/\?\?/) && (
+                    <Tooltip title={regexTooltip} >
+                        <button
+                            onClick={() => { updateFilterState(equal, logic, value, !regex) }}
+                            style={{ backgroundColor: regexBackground, height: "30px", padding: "0", alignItems: "center" }} >
+                            .*
+                        </button>
+                    </Tooltip>
+                )}
+
 
             </div>
 
@@ -228,9 +244,16 @@ function FilterParameter({ filter, setFilterState, filterState, filterIndex }) {
     )
 }
 
-function wordsListProcess(preFilteredRows, id) {
-    //console.log(preFilteredRows);
-    return []
+function wordsListProcess(preFilteredRows = [], id) {
+    let options = []
+    preFilteredRows.forEach((row)=>{
+        if (!options.find(value=> value === row.values[id])) {
+            options.push(row.values[id])
+        }
+        
+    })
+    //console.log(options);
+    return options
 }
 
 /**

@@ -17,7 +17,7 @@ export default function DownloadDataFile() {
         }
     }, [setRiData, riData])
 
-    console.log(riData);
+    //console.log(riData);
 
     return (
         <div>
