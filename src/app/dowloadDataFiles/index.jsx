@@ -5,7 +5,7 @@ import Paper from '@mui/material/Paper';
 import { getRIdata } from "./processFile/RI"
 import Table from "./table";
 
-const DESCRIPTION = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent leo diam, maximus vitae turpis non, maximus rhoncus dolor. Sed eget mauris molestie, fermentum sapien sit amet, dapibus neque. Quisque posuere ipsum ligula, sit amet suscipit elit auctor nec. Pellentesque lacinia rutrum dui, ut commodo metus elementum in."
+const DESCRIPTION = ""
 
 export default function DownloadDataFile() {
 
