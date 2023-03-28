@@ -78,7 +78,7 @@ function DownloadCVS(preGlobalFilteredRows = [], allColumns) {
         
 
     })
-    const filename = "data.txt"
+    const filename = "data.csv"
     const element = document.createElement('a');
     element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(fileInfo));
     element.setAttribute('download', filename);
@@ -90,28 +90,3 @@ function DownloadCVS(preGlobalFilteredRows = [], allColumns) {
 
     document.body.removeChild(element);
 }
-
-/**
- *<span>
-            <div style={{display: "grid", gridTemplateColumns: "21px auto"}} >
-            <i className='bx bx-search-alt' 
-                style={{textAlign: "center",fontSize: "21px"}}
-                onClick={()=>{
-                    let ipt = document.getElementById("input_global_search_authorTable");
-                    if(ipt)ipt.focus();
-                }}
-            />
-            <input
-                value={value || ""}
-                id="input_global_search_authorTable"
-                placeholder={`Global search in ${count} elements:`}
-                style={{width: "100%", border: "0px"}}
-                onChange={e => {
-                    setValue(e.target.value);
-                    onChange(e.target.value);
-                }}
-            />
-            </div>
-            
-        </span>
- */
