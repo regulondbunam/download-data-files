@@ -9,6 +9,7 @@ export default function GlobalFilter({
     preGlobalFilteredRows,
     globalFilter,
     setGlobalFilter,
+    allColumns
 }) {
     const count = preGlobalFilteredRows.length
     const [value, setValue] = React.useState(globalFilter)
@@ -40,13 +41,54 @@ export default function GlobalFilter({
                     />
                 </div>
                 <div>
-                    <Button>Download Table</Button>
+                    <Button onClick={() => { DownloadCVS(preGlobalFilteredRows, allColumns) }} >
+                        Download Table
+                    </Button>
                 </div>
 
             </div>
 
         </Box>
     )
+}
+
+function DownloadCVS(preGlobalFilteredRows = [], allColumns) {
+    if (preGlobalFilteredRows.length <= 0) {
+        return null
+    }
+    let visualColumns = []
+    allColumns.forEach(column => {
+        if (column.isVisible) {
+            visualColumns.push({ id: column.id, Header: column.Header })
+        }
+    })
+    let fileInfo = visualColumns.map(column => column.Header).join(", ") + "\n"
+    preGlobalFilteredRows.forEach((row) => {
+        let cells = []
+        try {
+            visualColumns.forEach(col=>{
+                cells.push(row.values[col.id])
+            })
+            fileInfo += cells.join(", ") + "\n"
+        } catch (error) {
+            console.log(row);
+            console.error(error);
+        }
+
+        
+
+    })
+    const filename = "data.txt"
+    const element = document.createElement('a');
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(fileInfo));
+    element.setAttribute('download', filename);
+
+    element.style.display = 'none';
+    document.body.appendChild(element);
+
+    element.click();
+
+    document.body.removeChild(element);
 }
 
 /**

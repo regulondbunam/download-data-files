@@ -37,7 +37,7 @@ export default function DownloadDataFile() {
                                             return null
                                         }
                                         return (
-                                            <div>
+                                            <div key={key}  >
                                                 <h4>{key}</h4>
                                                 <p dangerouslySetInnerHTML={{ __html: riData.metadata[key] }} />
                                             </div>

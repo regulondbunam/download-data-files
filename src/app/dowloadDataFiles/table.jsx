@@ -17,6 +17,7 @@ import { OptionFilter } from './processFile/filters';
 
 export default function Table({ columns, data, riData }) {
 
+    //const [downloadAction, setDownloadAction] = React.useState();
     const _nRows = 20
     const defaultColumn = React.useMemo(
         () => ({
@@ -61,7 +62,7 @@ export default function Table({ columns, data, riData }) {
     )
 
     // use row to download filtered data 
-    //console.log(rows)
+    //console.log(preGlobalFilteredRows)
 
     const itemSize = 30
     const heightTable = _nRows * itemSize
@@ -112,6 +113,7 @@ export default function Table({ columns, data, riData }) {
                             preGlobalFilteredRows={preGlobalFilteredRows}
                             globalFilter={state.globalFilter}
                             setGlobalFilter={setGlobalFilter}
+                            allColumns={allColumns}
                         />
                     </Paper>
                 </Box>
@@ -123,8 +125,8 @@ export default function Table({ columns, data, riData }) {
                         <div >
                             {headerGroups.map(headerGroup => (
                                 <div {...headerGroup.getHeaderGroupProps()} className="tr">
-                                    {headerGroup.headers.map(column => (
-                                        <div>
+                                    {headerGroup.headers.map((column, index) => (
+                                        <div key={`table_main_${index}`} >
                                             <div {...column.getHeaderProps()} className="th" >
                                                 {column.render('Header')}
                                                 <div

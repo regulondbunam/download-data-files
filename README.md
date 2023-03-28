@@ -1,4 +1,4 @@
-# [Software name] ri
+# RegulonDB Download Data Files
 
 # Description
 
